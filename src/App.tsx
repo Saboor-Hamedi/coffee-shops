@@ -5,6 +5,7 @@ import { api, type CoffeeItem, type UserProfile } from "./lib/api.js";
 
 // Components
 import Discovery from "./components/Discovery";
+import Hero from "./components/Hero";
 import Console from "./components/Console";
 import Modals from "./components/Modals";
 import Header from "./components/Header";
@@ -280,18 +281,21 @@ export default function App() {
       <main>
         <AnimatePresence mode="wait">
           {activeView === "discovery" ? (
-            <Discovery 
-              loading={loading}
-              filteredCoffees={filteredCoffees}
-              selectedRoast={selectedRoast}
-              setSelectedRoast={setSelectedRoast}
-              searchQuery={searchQuery}
-              setSearchQuery={setSearchQuery}
-              onAdd={startAdd}
-              onEdit={startEdit}
-              onDelete={handleDelete}
-              onView={setViewingItem}
-            />
+             <motion.div key="discovery-view" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="pt-[70px]">
+                <Hero />
+                <Discovery 
+                   loading={loading}
+                   filteredCoffees={filteredCoffees}
+                   selectedRoast={selectedRoast}
+                   setSelectedRoast={setSelectedRoast}
+                   searchQuery={searchQuery}
+                   setSearchQuery={setSearchQuery}
+                   onAdd={startAdd}
+                   onEdit={startEdit}
+                   onDelete={handleDelete}
+                   onView={setViewingItem}
+                />
+             </motion.div>
           ) : (
             <Console 
               user={user}

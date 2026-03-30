@@ -62,22 +62,24 @@ export default function Console(props: ConsoleProps) {
     handleUpdateProfile(e);
   };
 
-  // 🍱 UNIFIED INPUT ARCHITECTURE
+  // 🍱 UNIFIED INPUT ARCHITECTURE (Absolute Consistency)
   const InputField = ({ label, value, type = "text", onChange, errorMsg, isRequired = true }: any) => {
      const hasError = showErrors && isRequired && !value.trim();
      return (
        <div className="space-y-1.5 w-full">
-          <label className="text-[7.5px] font-black uppercase tracking-[0.25em] text-[var(--text-secondary)]">{label}</label>
+          <label className="text-[8px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">{label}</label>
           <input 
             type={type}
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className={`w-full bg-transparent border-t-0 border-x-0 rounded-none px-0 border-b-2 py-2 text-base sm:text-lg font-black lowercase outline-none transition-all duration-200
+            className={`w-full bg-transparent border-t-0 border-x-0 rounded-none px-0 border-b-2 py-2 text-base font-black outline-none transition-all duration-200 uppercase
               ${hasError ? 'border-red-500 text-red-500' : 'border-[var(--border-color)]/40 focus:border-indigo-500'}
             `}
           />
-          {hasError && <p className="text-[7.5px] text-red-500 font-bold uppercase tracking-widest leading-none">Fill this input *</p>}
-          {errorMsg && !hasError && <p className="text-[7.5px] text-red-500 font-bold uppercase tracking-widest leading-none">{errorMsg}</p>}
+          <div className="h-4 flex items-start">
+             {hasError && <p className="text-[8px] text-red-500 font-black uppercase tracking-widest leading-none">Fill this input *</p>}
+             {errorMsg && !hasError && <p className="text-[8px] text-red-500 font-black uppercase tracking-widest leading-none">{errorMsg}</p>}
+          </div>
        </div>
      );
   };
@@ -137,13 +139,13 @@ export default function Console(props: ConsoleProps) {
                       
                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                          <div className="lg:col-span-3 p-6 border border-[var(--border-color)]/30 rounded-[4px] bg-[var(--input-bg)]/5 space-y-8">
-                            <form onSubmit={handleSubmit} className="space-y-8 text-left">
+                            <form onSubmit={handleSubmit} className="space-y-4 text-left">
                                <InputField 
                                  label="Username" 
                                  value={newName} 
                                  onChange={setNewName} 
                                />
-                               <button type="submit" className="relative w-fit px-12 h-[40px] bg-indigo-600 hover:bg-black text-white rounded-[4px] text-[8.5px] font-black uppercase tracking-widest transition-all overflow-hidden">
+                               <button type="submit" className="relative w-fit px-12 h-[45px] bg-indigo-600 hover:bg-black text-white rounded-[4px] text-[8.5px] font-black uppercase tracking-widest transition-all overflow-hidden cursor-pointer mt-4">
                                   <AnimatePresence mode="wait">
                                     {isSubmitting ? (
                                       <motion.div key="loader" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} className="flex items-center justify-center">
@@ -176,7 +178,7 @@ export default function Console(props: ConsoleProps) {
                       
                       <div className="p-6 sm:p-8 border border-[var(--border-color)]/30 rounded-[4px] bg-[var(--input-bg)]/5 space-y-8 max-w-4xl">
                          {profileError && <p className="text-red-500 text-[8px] font-black uppercase tracking-[0.2em] text-center bg-red-500/5 py-3 border border-red-500/10 mb-6">{profileError}</p>}
-                         <form onSubmit={handleSubmit} className="space-y-8 text-left">
+                         <form onSubmit={handleSubmit} className="space-y-4 text-left">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                                <InputField 
                                  type="password"
@@ -193,28 +195,26 @@ export default function Console(props: ConsoleProps) {
                                  errorMsg={showErrors && confirmNewPassword && confirmNewPassword !== newPassword ? "Passwords do not match" : null}
                                />
                             </div>
-                            <div className="pt-8 border-t border-[var(--border-color)]/50 space-y-8">
-                               <div className="space-y-6">
-                                  <InputField 
-                                    type="password"
-                                    label="Current Password (Verification Required)" 
-                                    value={oldPassword} 
-                                    onChange={setOldPassword} 
-                                  />
-                                  <button type="submit" className="relative w-fit px-12 h-[40px] bg-indigo-600 hover:bg-black text-white rounded-[4px] text-[8.5px] font-black uppercase tracking-widest transition-all overflow-hidden">
-                                     <AnimatePresence mode="wait">
-                                       {isSubmitting ? (
-                                         <motion.div key="loader" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} className="flex items-center justify-center">
-                                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                         </motion.div>
-                                       ) : (
-                                         <motion.span key="label" initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}>
-                                            Update Password
-                                         </motion.span>
-                                       )}
-                                     </AnimatePresence>
-                                  </button>
-                               </div>
+                            <div className="pt-8 border-t border-[var(--border-color)]/50 space-y-6">
+                               <InputField 
+                                 type="password"
+                                 label="Current Password (Verification Required)" 
+                                 value={oldPassword} 
+                                 onChange={setOldPassword} 
+                               />
+                               <button type="submit" className="relative w-fit px-12 h-[45px] bg-indigo-600 hover:bg-black text-white rounded-[4px] text-[8.5px] font-black uppercase tracking-widest transition-all overflow-hidden cursor-pointer">
+                                  <AnimatePresence mode="wait">
+                                    {isSubmitting ? (
+                                      <motion.div key="loader" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} className="flex items-center justify-center">
+                                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                      </motion.div>
+                                    ) : (
+                                      <motion.span key="label" initial={{ opacity: 0, y: 5 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -5 }}>
+                                         Update Password
+                                      </motion.span>
+                                    )}
+                                  </AnimatePresence>
+                               </button>
                             </div>
                          </form>
                       </div>
