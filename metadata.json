@@ -1,0 +1,5 @@
+{
+  "name": "Database Explorer",
+  "description": "A database-driven application for managing and visualizing data.",
+  "requestFramePermissions": []
+}
