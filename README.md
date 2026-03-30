@@ -1,8 +1,5 @@
-<div align="center">
-  <img width="1200" height="auto" alt="Noir Roastery Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
-
 # 🌑 Noir Roastery: Database Explorer
+
 ### Premium Specialty Coffee Inventory Management System
 
 **Noir Roastery** is a high-end database explorer designed for specialty coffee curators. Built with a focus on Swiss-minimalist aesthetics and high-impact typography, it provides a sophisticated interface for managing unique coffee batches, origin data, and sensory notes.
@@ -31,24 +28,28 @@
 ## 🚀 Getting Started
 
 ### 📦 Prerequisites
+
 - **Node.js** (v18 or higher)
 - **npm** or **pnpm**
 
 ### 🛠️ Local Installation
 
 1. **Clone the repository:**
+
    ```bash
    git clone [repository-url]
    cd database-explorer
    ```
 
 2. **Install dependencies:**
+
    ```bash
    npm install
    ```
 
 3. **Configure Environment:**
    Create a `.env` file in the root directory (using `.env.example` as a template):
+
    ```env
    GEMINI_API_KEY=your_key_here
    ```
@@ -57,7 +58,7 @@
    ```bash
    npm run dev
    ```
-   *The server will be active at `http://localhost:3000`*
+   _The server will be active at `http://localhost:3000`_
 
 ---
 
@@ -83,11 +84,12 @@ a:/database-explorer/
 ## 🔍 Quality & Security Review
 
 A detailed code review has been performed on this repository. Key areas for future development include:
+
 - [ ] **Security**: Implementation of `bcrypt` for password hashing (currently in roadmap).
 - [ ] **AI Integration**: Expansion of automated sensory notes generation.
 - [ ] **Analytics**: Building the dedicated Curations Dashboard.
 
-*Refer to `analysis_results.md` for a comprehensive review of the codebase.*
+_Refer to `analysis_results.md` for a comprehensive review of the codebase._
 
 ---
 
