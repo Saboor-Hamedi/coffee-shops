@@ -108,5 +108,11 @@ export const api = {
       body: JSON.stringify({ coffee_id: coffeeId, quantity, total_price: totalPrice }),
     });
     if (!res.ok) throw new Error("Archival order failure");
+  },
+
+  fetchAnalytics: async (): Promise<{ order_count: number; orders: any[] }> => {
+    const res = await fetch(`${API_URL}/analytics`);
+    if (!res.ok) throw new Error("Analytics retrieval failure");
+    return res.json();
   }
 };

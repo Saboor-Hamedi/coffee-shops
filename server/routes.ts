@@ -29,18 +29,20 @@ router.post("/auth/login", (req, res) => {
 
 router.put("/auth/profile", (req, res) => {
   const { email, oldPassword, newPassword, newName } = req.body;
-  db.get("SELECT * FROM users WHERE email = ?", [email], (err, user: any) => {
-    if (err || !user) return res.status(401).json({ error: "NoSuchCurator" });
-    if (user.password !== oldPassword) return res.status(401).json({ error: "InvalidSecurityKey" });
-    
-    const finalPassword = newPassword || oldPassword;
-    const finalName = newName || user.name;
-    
-    db.run("UPDATE users SET password = ?, name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?", [finalPassword, finalName, user.id], (err) => {
-      if (err) return res.status(500).json({ error: "Archive update failure" });
-      res.json({ success: true, name: finalName });
+    db.get("SELECT * FROM users WHERE email = ?", [email], (err, user: any) => {
+      if (err || !user) return res.status(401).json({ error: "NoSuchCurator" });
+      
+      // Verification logic: Password is ONLY required if newPassword is provided OR for identity proofing (but making identity proof optional for name-only)
+      if (newPassword && user.password !== oldPassword) return res.status(401).json({ error: "InvalidSecurityKey" });
+      
+      const finalPassword = newPassword || user.password;
+      const finalName = newName || user.name;
+      
+      db.run("UPDATE users SET password = ?, name = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?", [finalPassword, finalName, user.id], (err) => {
+        if (err) return res.status(500).json({ error: "Archive update failure" });
+        res.json({ success: true, name: finalName });
+      });
     });
-  });
 });
 
 // Coffees API
