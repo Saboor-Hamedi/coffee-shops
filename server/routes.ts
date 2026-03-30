@@ -47,67 +47,62 @@ router.put("/auth/profile", (req, res) => {
 
 // Coffees API
 router.get("/coffees", (req, res) => {
-  const limit = parseInt(req.query.limit as string) || 20;
-  const offset = parseInt(req.query.offset as string) || 0;
-  db.all("SELECT * FROM coffees ORDER BY id DESC LIMIT ? OFFSET ?", [limit, offset], (err, rows) => {
+  const limit = parseInt(req.query.limit as string) || 40;
+  db.all("SELECT * FROM coffees ORDER BY id DESC LIMIT ?", [limit], (err, rows) => {
     if (err) return res.status(500).json({ error: err.message });
     res.json(rows);
   });
 });
 
 router.post("/coffees", (req, res) => {
-  const { name, brand, origin, roast_level, price, notes, image_url, roast_date } = req.body;
+  const { name, brand, origin, roast_level, price, notes, image_url, roast_date, quantity, is_public } = req.body;
   db.run(
-    "INSERT INTO coffees (name, brand, origin, roast_level, price, notes, image_url, roast_date) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-    [name, brand, origin, roast_level, price, notes, image_url, roast_date],
+    "INSERT INTO coffees (name, brand, origin, roast_level, price, notes, image_url, roast_date, quantity, sold_count, is_public) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+    [name, brand, origin, roast_level, price, notes, image_url, roast_date, quantity || 0, 0, is_public ?? 1],
     function (err) {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ id: this.lastID, name, brand, origin, roast_level, price, notes, image_url, roast_date });
+      res.json({ id: this.lastID, name, brand, origin, roast_level, price, notes, image_url, roast_date, quantity: quantity || 0, sold_count: 0, is_public: is_public ?? 1 });
     }
   );
 });
 
 router.put("/coffees/:id", (req, res) => {
   const { id } = req.params;
-  const { name, brand, origin, roast_level, price, notes, image_url, roast_date } = req.body;
+  const { name, brand, origin, roast_level, price, notes, image_url, roast_date, quantity, sold_count, is_public } = req.body;
   db.run(
     `UPDATE coffees 
-     SET name = ?, brand = ?, origin = ?, roast_level = ?, price = ?, notes = ?, image_url = ?, roast_date = ? 
+     SET name = ?, brand = ?, origin = ?, roast_level = ?, price = ?, notes = ?, image_url = ?, roast_date = ?, quantity = ?, sold_count = ?, is_public = ? 
      WHERE id = ?`,
-    [name, brand, origin, roast_level, price, notes, image_url, roast_date, id],
+    [name, brand, origin, roast_level, price, notes, image_url, roast_date, quantity, sold_count, is_public, id],
     function (err) {
       if (err) return res.status(500).json({ error: err.message });
-      res.json({ id, name, brand, origin, roast_level, price, notes, image_url, roast_date });
+      res.json({ id, name, brand, origin, roast_level, price, notes, image_url, roast_date, quantity, sold_count, is_public });
     }
   );
 });
 
-router.delete("/coffees/:id", (req, res) => {
-  db.run("DELETE FROM coffees WHERE id = ?", req.params.id, (err) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ deleted: true });
-  });
-});
-
-// Analytics API
-router.get("/analytics", (req, res) => {
-  db.all("SELECT * FROM orders", (err, orders) => {
-    if (err) return res.status(500).json({ error: err.message });
-    res.json({ order_count: orders.length, orders });
-  });
-});
-
-// Order Processing
 router.post("/orders", (req, res) => {
   const { coffee_id, quantity, total_price } = req.body;
-  db.run(
-    "INSERT INTO orders (coffee_id, quantity, total_price) VALUES (?, ?, ?)",
-    [coffee_id, quantity, total_price],
-    function (err) {
-      if (err) return res.status(500).json({ error: err.message });
-      res.json({ id: this.lastID, coffee_id, quantity, total_price });
-    }
-  );
+  db.serialize(() => {
+    // 1. Log Order
+    db.run(
+      "INSERT INTO orders (coffee_id, quantity, total_price) VALUES (?, ?, ?)",
+      [coffee_id, quantity, total_price],
+      function (err) {
+        if (err) return res.status(500).json({ error: "Archival recording failed" });
+        
+        // 2. Direct Sales Performance Sync (Increment sold_count only)
+        db.run(
+          "UPDATE coffees SET sold_count = sold_count + ? WHERE id = ?",
+          [quantity, coffee_id],
+          (err) => {
+            if (err) console.error("Inventory sync failure", err.message);
+            res.json({ id: this.lastID, coffee_id, quantity, total_price });
+          }
+        );
+      }
+    );
+  });
 });
 
 // AI Description API

@@ -20,15 +20,20 @@ const db = new sqlite3.Database(dbPath, (err) => {
           notes TEXT,
           image_url TEXT,
           roast_date TEXT,
-          ai_description TEXT
+          ai_description TEXT,
+          quantity INTEGER DEFAULT 0,
+          sold_count INTEGER DEFAULT 0,
+          is_public INTEGER DEFAULT 1
         )`, (err) => {
           if (!err) {
             db.all("PRAGMA table_info(coffees)", (err, columns: any[]) => {
               if (columns) {
-                const hasBrand = columns.some(c => c.name === "brand");
-                const hasRoastDate = columns.some(c => c.name === "roast_date");
-                if (!hasBrand) db.run("ALTER TABLE coffees ADD COLUMN brand TEXT");
-                if (!hasRoastDate) db.run("ALTER TABLE coffees ADD COLUMN roast_date TEXT");
+                const names = columns.map(c => c.name);
+                if (!names.includes("brand")) db.run("ALTER TABLE coffees ADD COLUMN brand TEXT");
+                if (!names.includes("roast_date")) db.run("ALTER TABLE coffees ADD COLUMN roast_date TEXT");
+                if (!names.includes("quantity")) db.run("ALTER TABLE coffees ADD COLUMN quantity INTEGER DEFAULT 0");
+                if (!names.includes("sold_count")) db.run("ALTER TABLE coffees ADD COLUMN sold_count INTEGER DEFAULT 0");
+                if (!names.includes("is_public")) db.run("ALTER TABLE coffees ADD COLUMN is_public INTEGER DEFAULT 1");
               }
             });
           }

@@ -11,6 +11,9 @@ export interface CoffeeItem {
   image_url: string;
   roast_date: string;
   ai_description?: string;
+  quantity: number;
+  sold_count: number;
+  is_public: number; // 1 for true, 0 for false
 }
 
 export interface UserProfile {

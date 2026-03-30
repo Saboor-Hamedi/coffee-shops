@@ -56,7 +56,6 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedRoast, setSelectedRoast] = useState("All Roasts");
   const [formError, setFormError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Form State
   const [name, setName] = useState("");
@@ -64,14 +63,18 @@ export default function App() {
   const [origin, setOrigin] = useState("");
   const [roast, setRoast] = useState("Medium");
   const [price, setPrice] = useState("");
-  const [notes, setNotes] = useState("");
   const [imageUrl, setImageUrl] = useState("");
+  const [notes, setNotes] = useState("");
+  const [formQuantity, setFormQuantity] = useState("0");
+  const [formSoldCount, setFormSoldCount] = useState("0");
+  const [formIsPublic, setFormIsPublic] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const STYLES = {
-    input: "w-full bg-[var(--input-bg)] border border-[var(--border-color)] rounded-[5px] py-1.5 px-3 sm:py-2 px-5 font-black text-[8.5px] sm:text-[9px] tracking-[0.2em] uppercase outline-none focus:border-indigo-500 transition-all cursor-text",
-    button: "w-full bg-indigo-500 hover:bg-black text-white py-1.5 px-3 sm:py-2 px-5 rounded-[5px] font-black text-[8.5px] sm:text-[9px] tracking-[0.3em] uppercase transition-all flex items-center justify-center gap-2 shadow-sm active:scale-95 cursor-pointer",
-    label: "text-[7.5px] font-black uppercase tracking-[0.25em] text-[var(--text-secondary)]"
+    input: "w-full bg-[var(--input-bg)]/50 border border-[var(--border-color)]/30 rounded-[4px] py-2 px-5 font-bold text-[10px] tracking-normal outline-none focus:border-indigo-500 transition-all cursor-text",
+    button: "w-full bg-indigo-600 hover:bg-black text-white py-2.5 px-5 rounded-[4px] font-black text-[10px] tracking-normal transition-all flex items-center justify-center gap-2 shadow-xl shadow-indigo-600/5 active:scale-95 cursor-pointer",
+    label: "text-[8px] font-black tracking-normal text-[var(--text-secondary)] mb-1 block"
   };
 
   useEffect(() => {
@@ -195,7 +198,11 @@ export default function App() {
   const startEdit = (coffee: CoffeeItem) => {
     if (!user) { setIsAuthModalOpen(true); return; }
     setEditingItem(coffee);
-    setName(coffee.name || ""); setBrand(coffee.brand || ""); setOrigin(coffee.origin || ""); setRoast(coffee.roast_level || "Medium"); setPrice(coffee.price?.toString() || ""); setNotes(coffee.notes || ""); setImageUrl(coffee.image_url || "");
+    setName(coffee.name || ""); setBrand(coffee.brand || ""); setOrigin(coffee.origin || ""); setRoast(coffee.roast_level || "Medium"); setPrice(coffee.price?.toString() || "");    setNotes(coffee.notes);
+    setImageUrl(coffee.image_url);
+    setFormQuantity(coffee.quantity.toString());
+    setFormSoldCount(coffee.sold_count.toString());
+    setFormIsPublic(coffee.is_public);
     setIsFormOpen(true);
   };
 
@@ -213,24 +220,32 @@ export default function App() {
     e.preventDefault(); setFormError(null); setIsSubmitting(true);
     const data = { 
       name: name.trim(), brand: brand.trim(), origin: origin.trim(), 
-      roast_level: roast, price: parseFloat(price) || 0, 
-      notes: notes.trim(), image_url: imageUrl.trim() || "https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=800", 
-      roast_date: new Date().toISOString() 
+      roast_level: roast as any,
+      price: parseFloat(price) || 0, 
+      notes: notes.trim(), 
+      image_url: imageUrl.trim() || "https://images.unsplash.com/photo-1511920170033-f8396924c348?q=80&w=800", 
+      roast_date: editingItem ? editingItem.roast_date : new Date().toISOString(),
+      quantity: parseInt(formQuantity) || 0,
+      is_public: formIsPublic,
+      sold_count: parseInt(formSoldCount) || 0
     };
     if (!data.name) { setFormError("Name is required"); setIsSubmitting(false); return; }
     try {
       if (editingItem) {
-        await api.updateCoffee(editingItem.id, data);
-        showNotification("Item Updated");
+        const updated = await api.updateCoffee(editingItem.id, data);
+        setCoffees(coffees.map(c => c.id === editingItem.id ? updated : c));
+        showNotification("Batch refined successfully", "success");
       } else {
-        await api.addCoffee(data);
-        showNotification("Item Added");
+        const added = await api.addCoffee(data);
+        setCoffees([added, ...coffees]);
+        showNotification("Batch archived successfully", "success");
       }
       resetForm();
-      setSearchQuery("");
-      setSelectedRoast("All Roasts");
-      await fetchInitialCoffees();
-    } catch (err: any) { setFormError("Update failed"); } finally { setIsSubmitting(false); }
+    } catch (err: any) {
+      setFormError(err.message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const confirmDelete = async () => {
@@ -243,7 +258,13 @@ export default function App() {
     } catch (err) { showNotification("Delete failed", "error"); }
   };
 
-  const resetForm = () => { setName(""); setBrand(""); setOrigin(""); setRoast("Medium"); setPrice(""); setNotes(""); setImageUrl(""); setEditingItem(null); setIsFormOpen(false); setFormError(null); };
+  const resetForm = () => { setName(""); setBrand(""); setOrigin(""); setRoast("Medium"); setPrice("");    setNotes("");
+    setImageUrl("");
+    setFormQuantity("0");
+    setFormSoldCount("0");
+    setFormIsPublic(1);
+    setFormError(null);
+ setIsFormOpen(false); setFormError(null); };
 
   const filteredCoffees = useMemo(() => {
     const list = Array.isArray(coffees) ? coffees : [];
@@ -309,6 +330,8 @@ export default function App() {
               isSidebarOpen={isSidebarOpen}
               setIsSidebarOpen={setIsSidebarOpen}
               onUpdateUser={setUser}
+              onEdit={startEdit}
+              onDelete={handleDelete}
               showNotification={showNotification}
               isMobile={isMobile}
               setActiveView={setActiveView}
@@ -381,6 +404,12 @@ export default function App() {
         setImageUrl={setImageUrl}
         notes={notes}
         setNotes={setNotes}
+        quantity={formQuantity}
+        setQuantity={setFormQuantity}
+        soldCount={formSoldCount}
+        setSoldCount={setFormSoldCount}
+        isPublic={formIsPublic}
+        setIsPublic={setFormIsPublic}
         viewingItem={viewingItem}
         setViewingItem={setViewingItem}
         startEdit={startEdit}

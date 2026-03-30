@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { User, ShieldCheck, BarChart3, Database, LogOut, Loader2, Save, TrendingUp, CreditCard, Coffee, PackageCheck, ShoppingBag, HardDrive, Sun, Moon, LayoutGrid } from "lucide-react";
+import { User, ShieldCheck, BarChart3, Database, LogOut, Loader2, Save, TrendingUp, CreditCard, Coffee, PackageCheck, ShoppingBag, HardDrive, Sun, Moon, LayoutGrid, Library, Settings, RefreshCcw, Globe, Edit3, Trash2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import type { UserProfile, CoffeeItem } from "../lib/api.js";
 
@@ -12,6 +12,8 @@ interface ConsoleProps {
   isSidebarOpen: boolean;
   setIsSidebarOpen: (open: boolean) => void;
   onUpdateUser: (u: any) => void;
+  onEdit: (c: CoffeeItem) => void;
+  onDelete: (id: number) => void;
   showNotification: (msg: string, type?: "success" | "error") => void;
   isMobile: boolean;
   setActiveView: (view: "discovery" | "persona") => void;
@@ -38,7 +40,8 @@ export default function Console(props: ConsoleProps) {
     isSidebarOpen, setIsSidebarOpen, isMobile, 
     handleLogout, handleUpdateProfile, newName, setNewName, 
     newPassword, setNewPassword, confirmNewPassword, setConfirmNewPassword, 
-    oldPassword, setOldPassword, profileError, isSubmitting, STYLES, theme, setTheme 
+    oldPassword, setOldPassword, profileError, isSubmitting, STYLES, theme, setTheme,
+    onEdit, onDelete
   } = props;
 
   const [showErrors, setShowErrors] = useState(false);
@@ -49,10 +52,11 @@ export default function Console(props: ConsoleProps) {
   }, [settingsTab]);
 
   const TABS = [
-    { id: "identity", label: "Identity", icon: User, desc: "Curator handle & metadata" }, 
+    { id: "identity", label: "PROFILE", icon: User, desc: "Curator handle & metadata" }, 
     { id: "security", label: "Security", icon: ShieldCheck, desc: "Credential hardening" }, 
+    { id: "posts", label: "Registry", icon: Database, desc: "Master batch management" },
     { id: "analytics", label: "Intelligence", icon: BarChart3, desc: "Market flow & volume" }, 
-    { id: "archival", label: "Archival", icon: Database, desc: "System lifecycle management" },
+    { id: "archival", label: "Archival", icon: Library, desc: "System lifecycle management" },
     { id: "theme", label: "Vision", icon: Sun, desc: "Interface aesthetics" }
   ];
 
@@ -67,7 +71,7 @@ export default function Console(props: ConsoleProps) {
      const hasError = showErrors && isRequired && !value.trim();
      return (
        <div className="space-y-1.5 w-full">
-          <label className="text-[8px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">{label}</label>
+          <label className="text-[8px] font-black uppercase tracking-normal text-[var(--text-secondary)]">{label}</label>
           <input 
             type={type}
             value={value}
@@ -77,8 +81,8 @@ export default function Console(props: ConsoleProps) {
             `}
           />
           <div className="h-4 flex items-start">
-             {hasError && <p className="text-[8px] text-red-500 font-black uppercase tracking-widest leading-none">Fill this input *</p>}
-             {errorMsg && !hasError && <p className="text-[8px] text-red-500 font-black uppercase tracking-widest leading-none">{errorMsg}</p>}
+             {hasError && <p className="text-[8px] text-red-500 font-black uppercase tracking-normal leading-none">Fill this input *</p>}
+             {errorMsg && !hasError && <p className="text-[8px] text-red-500 font-black uppercase tracking-normal leading-none">{errorMsg}</p>}
           </div>
        </div>
      );
@@ -104,8 +108,8 @@ export default function Console(props: ConsoleProps) {
                >
                   <tab.icon className={`w-3 h-3 transition-transform duration-300 ${settingsTab === tab.id ? "scale-110" : ""}`} />
                   <div className="flex flex-col items-start leading-none gap-1">
-                     <span className="text-[8.5px] font-black uppercase tracking-[0.1em]">{tab.label}</span>
-                     <span className={`text-[6px] font-bold uppercase tracking-widest opacity-40 ${settingsTab === tab.id ? "text-indigo-100" : ""}`}>{tab.desc}</span>
+                     <span className="text-[8.5px] font-black uppercase tracking-normal">{tab.label}</span>
+                     <span className={`text-[6px] font-bold uppercase tracking-normal opacity-40 ${settingsTab === tab.id ? "text-indigo-100" : ""}`}>{tab.desc}</span>
                   </div>
                   {settingsTab === tab.id && <motion.div layoutId="active-ind" className="absolute left-0 w-0.5 h-3.5 bg-white rounded-full -ml-0.25" />}
                </button>
@@ -118,8 +122,8 @@ export default function Console(props: ConsoleProps) {
                    {user?.name?.[0]}
                 </div>
                 <div className="flex-1 min-w-0">
-                   <p className="text-[8px] font-black uppercase truncate tracking-wider">{user?.name}</p>
-                   <p className="text-[6.5px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.1em] truncate">{user?.email}</p>
+                   <p className="text-[8px] font-black uppercase truncate tracking-normal">{user?.name}</p>
+                   <p className="text-[6.5px] font-bold text-[var(--text-secondary)] uppercase tracking-normal truncate">{user?.email}</p>
                 </div>
                 <button onClick={handleLogout} className="text-[var(--text-secondary)] hover:text-red-500 transition-colors p-1"><LogOut className="w-3 h-3" /></button>
              </div>
@@ -133,8 +137,8 @@ export default function Console(props: ConsoleProps) {
                 {settingsTab === "identity" && (
                    <motion.div key="identity" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-10">
                       <div className="space-y-1">
-                         <p className="text-[7px] font-black uppercase tracking-[0.4em] text-indigo-500">System Descriptor</p>
-                         <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tighter leading-none">Identity.</h1>
+                         <p className="text-[7px] font-black uppercase tracking-normal text-indigo-500">System Descriptor</p>
+                         <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-normal leading-none">Identity.</h1>
                       </div>
                       
                       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -145,7 +149,7 @@ export default function Console(props: ConsoleProps) {
                                  value={newName} 
                                  onChange={setNewName} 
                                />
-                               <button type="submit" className="relative w-fit px-12 h-[45px] bg-indigo-600 hover:bg-black text-white rounded-[4px] text-[8.5px] font-black uppercase tracking-widest transition-all overflow-hidden cursor-pointer mt-4">
+                               <button type="submit" className="relative w-fit px-12 h-[45px] bg-indigo-600 hover:bg-black text-white rounded-[4px] text-[8.5px] font-black uppercase tracking-normal transition-all overflow-hidden cursor-pointer mt-4">
                                   <AnimatePresence mode="wait">
                                     {isSubmitting ? (
                                       <motion.div key="loader" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} className="flex items-center justify-center">
@@ -163,21 +167,94 @@ export default function Console(props: ConsoleProps) {
                          
                          <div className="p-6 border border-[var(--border-color)]/20 rounded-[4px] space-y-4 flex flex-col justify-center">
                             <LayoutGrid className="w-3.5 h-3.5 text-indigo-500" />
-                            <p className="text-[7px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">Status: Active</p>
+                            <p className="text-[7px] font-black uppercase tracking-normal text-[var(--text-secondary)]">Status: Active</p>
                          </div>
                       </div>
                    </motion.div>
                 )}
 
+                 {settingsTab === "posts" && (
+                    <motion.div key="registry" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-10">
+                       <div className="space-y-1">
+                          <p className="text-[7px] font-black uppercase tracking-normal text-indigo-500">Archival Manifest</p>
+                          <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-normal leading-none">Registry.</h1>
+                       </div>
+                       
+                       <div className="p-1 border border-[var(--border-color)]/30 rounded-[4px] bg-[var(--input-bg)]/5 overflow-hidden">
+                          <div className="overflow-x-auto no-scrollbar">
+                             <table className="w-full text-left border-collapse">
+                                <thead>
+                                   <tr className="border-b border-[var(--border-color)]/50">
+                                      <th className="px-6 py-4 text-[7.5px] font-black uppercase tracking-normal text-[var(--text-secondary)]">Identifier</th>
+                                      <th className="px-6 py-4 text-[7.5px] font-black uppercase tracking-normal text-[var(--text-secondary)]">Descriptor</th>
+                                      <th className="px-6 py-4 text-[7.5px] font-black uppercase tracking-normal text-[var(--text-secondary)]">Stock</th>
+                                      <th className="px-6 py-4 text-[7.5px] font-black uppercase tracking-normal text-[var(--text-secondary)]">Flow</th>
+                                      <th className="px-6 py-4 text-[7.5px] font-black uppercase tracking-normal text-[var(--text-secondary)] text-right">Commit</th>
+                                      <th className="px-6 py-4 text-[7.5px] font-black uppercase tracking-normal text-[var(--text-secondary)] text-right">Ops</th>
+                                   </tr>
+                                </thead>
+                                <tbody className="divide-y divide-[var(--border-color)]/20">
+                                   {coffees.map(c => {
+                                     const remaining = Math.max(0, c.quantity - c.sold_count);
+                                     return (
+                                       <tr key={c.id} className="hover:bg-white/5 transition-colors group">
+                                          <td className="px-6 py-4">
+                                             <div className="flex flex-col gap-1.5">
+                                                <span className="text-[8px] font-black font-mono text-indigo-500 whitespace-nowrap">ID_0{c.id}</span>
+                                                <span className={`text-[6px] font-bold px-1.5 py-0.5 rounded-[2px] w-fit ${c.is_public === 1 ? "bg-green-500/10 text-green-500" : "bg-red-500/10 text-red-500"}`}>
+                                                   {c.is_public === 1 ? "PUBLISHED" : "PRIVATE"}
+                                                </span>
+                                             </div>
+                                          </td>
+                                          <td className="px-6 py-4">
+                                             <div className="flex flex-col">
+                                                <span className="text-[9.5px] font-black uppercase tracking-normal">{c.name}</span>
+                                                <span className="text-[7px] font-bold text-[var(--text-secondary)] uppercase">{c.brand}</span>
+                                             </div>
+                                          </td>
+                                          <td className="px-6 py-4">
+                                             <div className="flex flex-col">
+                                                <div className="flex items-baseline gap-1">
+                                                   <span className={`text-[10px] font-black ${remaining <= 5 ? "text-red-500" : "text-[var(--text-primary)]"}`}>{remaining}</span>
+                                                   <span className="text-[7px] font-black text-[var(--text-secondary)]">/ {c.quantity}</span>
+                                                </div>
+                                                <span className="text-[6px] font-bold text-[var(--text-secondary)] uppercase tracking-normal">Units Avail</span>
+                                             </div>
+                                          </td>
+                                          <td className="px-6 py-4">
+                                             <div className="flex flex-col">
+                                                <span className="text-[9px] font-black text-indigo-500">{c.sold_count}</span>
+                                                <span className="text-[6px] font-bold text-[var(--text-secondary)] uppercase tracking-normal">Sold Total</span>
+                                             </div>
+                                          </td>
+                                          <td className="px-6 py-4 text-right">
+                                             <span className="text-[10px] font-serif italic text-indigo-500">${c.price.toFixed(2)}</span>
+                                          </td>
+                                          <td className="px-6 py-4 text-right">
+                                             <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button onClick={() => onEdit(c)} className="p-2 border border-[var(--border-color)]/50 rounded-[3px] hover:bg-black hover:text-white transition-all cursor-pointer"><Edit3 className="w-2.5 h-2.5" /></button>
+                                                <button onClick={() => onDelete(c.id)} className="p-2 border border-red-500/20 rounded-[3px] text-red-500/50 hover:bg-red-500 hover:text-white transition-all cursor-pointer"><Trash2 className="w-2.5 h-2.5" /></button>
+                                             </div>
+                                          </td>
+                                       </tr>
+                                     );
+                                   })}
+                                </tbody>
+                             </table>
+                          </div>
+                       </div>
+                    </motion.div>
+                 )}
+
                 {settingsTab === "security" && (
                    <motion.div key="security" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-10">
                       <div className="space-y-1">
-                         <p className="text-[7px] font-black uppercase tracking-[0.4em] text-red-500">Encryption Layer</p>
-                         <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tighter leading-none">Security.</h1>
+                         <p className="text-[7px] font-black uppercase tracking-normal text-red-500">Encryption Layer</p>
+                         <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-normal leading-none">Security.</h1>
                       </div>
                       
                       <div className="p-6 sm:p-8 border border-[var(--border-color)]/30 rounded-[4px] bg-[var(--input-bg)]/5 space-y-8 max-w-4xl">
-                         {profileError && <p className="text-red-500 text-[8px] font-black uppercase tracking-[0.2em] text-center bg-red-500/5 py-3 border border-red-500/10 mb-6">{profileError}</p>}
+                         {profileError && <p className="text-red-500 text-[8px] font-black uppercase tracking-normal text-center bg-red-500/5 py-3 border border-red-500/10 mb-6">{profileError}</p>}
                          <form onSubmit={handleSubmit} className="space-y-4 text-left">
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                                <InputField 
@@ -202,7 +279,7 @@ export default function Console(props: ConsoleProps) {
                                  value={oldPassword} 
                                  onChange={setOldPassword} 
                                />
-                               <button type="submit" className="relative w-fit px-12 h-[45px] bg-indigo-600 hover:bg-black text-white rounded-[4px] text-[8.5px] font-black uppercase tracking-widest transition-all overflow-hidden cursor-pointer">
+                               <button type="submit" className="relative w-fit px-12 h-[45px] bg-indigo-600 hover:bg-black text-white rounded-[4px] text-[8.5px] font-black uppercase tracking-normal transition-all overflow-hidden cursor-pointer">
                                   <AnimatePresence mode="wait">
                                     {isSubmitting ? (
                                       <motion.div key="loader" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.8 }} className="flex items-center justify-center">
@@ -224,8 +301,8 @@ export default function Console(props: ConsoleProps) {
                 {settingsTab === "analytics" && (
                    <motion.div key="analytics" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-10">
                       <div className="space-y-1">
-                         <p className="text-[7px] font-black uppercase tracking-[0.4em] text-indigo-500">Distribution Intelligence</p>
-                         <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tighter leading-none">Intelligence.</h1>
+                         <p className="text-[7px] font-black uppercase tracking-normal text-indigo-500">Distribution Intelligence</p>
+                         <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-normal leading-none">Intelligence.</h1>
                       </div>
                       
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -235,9 +312,9 @@ export default function Console(props: ConsoleProps) {
                            { label: "Batches", val: coffees.length, icon: Coffee }
                          ].map((stat) => (
                            <div key={stat.label} className="p-6 border border-[var(--border-color)]/30 rounded-[4px] bg-[var(--input-bg)]/5 space-y-4">
-                              <p className="text-[7px] font-black uppercase tracking-[0.3em] text-[var(--text-secondary)]">{stat.label}</p>
+                              <p className="text-[7px] font-black uppercase tracking-normal text-[var(--text-secondary)]">{stat.label}</p>
                               <div className="flex items-center justify-between">
-                                 <p className="text-3xl font-black tracking-tighter">{stat.val}</p>
+                                 <p className="text-3xl font-black tracking-normal">{stat.val}</p>
                                  <stat.icon className="w-3.5 h-3.5 text-indigo-500 opacity-40" />
                               </div>
                            </div>
@@ -245,7 +322,7 @@ export default function Console(props: ConsoleProps) {
                       </div>
 
                       <div className="p-6 border border-[var(--border-color)]/30 rounded-[4px] space-y-6">
-                         <h3 className="text-lg font-black uppercase tracking-widest flex items-center gap-3">
+                         <h3 className="text-lg font-black uppercase tracking-normal flex items-center gap-3">
                             <PackageCheck className="w-4 h-4 text-indigo-500" />
                             Log Feed
                          </h3>
@@ -255,7 +332,7 @@ export default function Console(props: ConsoleProps) {
                                 <div key={o.id} className="flex items-center justify-between p-3 border-b border-[var(--border-color)]/40 hover:bg-white/5 transition-colors -mx-2 rounded-[4px]">
                                    <div>
                                       <p className="text-[8px] font-black">ID_0{o.id}</p>
-                                      <p className="text-[7px] font-bold text-[var(--text-secondary)] uppercase tracking-[0.2em]">{new Date(o.created_at).toLocaleDateString()}</p>
+                                      <p className="text-[7px] font-bold text-[var(--text-secondary)] uppercase tracking-normal">{new Date(o.created_at).toLocaleDateString()}</p>
                                    </div>
                                    <p className="text-base font-serif italic text-indigo-500">${o.total_price.toFixed(2)}</p>
                                 </div>
@@ -263,7 +340,7 @@ export default function Console(props: ConsoleProps) {
                             ) : (
                               <div className="py-16 text-center opacity-30">
                                  <ShoppingBag className="w-8 h-8 mx-auto mb-4" />
-                                 <p className="text-[7px] font-black uppercase tracking-[0.5em]">Zero Activity</p>
+                                 <p className="text-[7px] font-black uppercase tracking-normal">Zero Activity</p>
                               </div>
                             )}
                          </div>
@@ -274,8 +351,8 @@ export default function Console(props: ConsoleProps) {
                 {settingsTab === "theme" && (
                    <motion.div key="theme" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} className="space-y-10">
                       <div className="space-y-1">
-                         <p className="text-[7px] font-black uppercase tracking-[0.4em] text-indigo-500">System Mode</p>
-                         <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-tighter leading-none">Vision.</h1>
+                         <p className="text-[7px] font-black uppercase tracking-normal text-indigo-500">System Mode</p>
+                         <h1 className="text-3xl sm:text-4xl font-black uppercase tracking-normal leading-none">Vision.</h1>
                       </div>
                       
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl">

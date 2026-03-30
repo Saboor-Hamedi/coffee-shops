@@ -51,13 +51,13 @@ export default function Header(props: HeaderProps) {
          )}
 
          {/* BRAND / LOGO */}
-         <div onClick={() => { setActiveView("discovery"); setIsProfileOpen(false); }} className="flex items-center gap-4 cursor-pointer group h-full whitespace-nowrap">
-            <div className="w-1.5 h-1.5 bg-indigo-500 rounded-[5px] animate-pulse" />
-            <div className="flex flex-col -space-y-0.5">
-               <p className="text-[9px] font-black uppercase tracking-[0.4em]">Noir Roastery</p>
-               {activeView === "persona" && <p className="text-[7px] font-black uppercase text-indigo-500 tracking-[0.2em] opacity-80 hidden sm:block">Dashboard Console</p>}
-            </div>
-         </div>
+          <div onClick={() => { setActiveView("discovery"); setIsProfileOpen(false); }} className="flex items-center gap-4 cursor-pointer group h-full whitespace-nowrap">
+             <div className="w-1.5 h-1.5 bg-indigo-500 rounded-[5px] animate-pulse" />
+             <div className="flex flex-col -space-y-0.5">
+                <p className="text-[10px] font-black uppercase tracking-tight">Noir Roastery</p>
+                {activeView === "persona" && <p className="text-[7px] font-black uppercase text-indigo-500 tracking-normal opacity-80 hidden sm:block">Dashboard Console</p>}
+             </div>
+          </div>
       </div>
 
       <div className="flex items-center gap-4 h-full relative">
@@ -145,8 +145,8 @@ export default function Header(props: HeaderProps) {
               </AnimatePresence>
            </div>
          ) : (
-           <button onClick={onAuth} className="text-[8px] font-black uppercase tracking-[0.3em] text-indigo-500 transition-all cursor-pointer border border-indigo-500/20 px-5 py-2.5 rounded-[5px] hover:bg-indigo-500 hover:text-white whitespace-nowrap">
-              Identity Verification
+           <button onClick={onAuth} className="text-[9px] font-black uppercase tracking-[0.4em] text-indigo-500 transition-all cursor-pointer border border-indigo-500/20 px-6 py-2.5 rounded-[4px] hover:bg-indigo-500 hover:text-white whitespace-nowrap active:scale-95 shadow-sm">
+              Login
            </button>
          )}
       </div>

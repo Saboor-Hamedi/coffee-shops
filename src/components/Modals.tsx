@@ -38,6 +38,12 @@ interface ModalsProps {
   setImageUrl: (u: string) => void;
   notes: string;
   setNotes: (n: string) => void;
+  quantity: string;
+  setQuantity: (q: string) => void;
+  soldCount: string;
+  setSoldCount: (s: string) => void;
+  isPublic: number;
+  setIsPublic: (p: number) => void;
 
   viewingItem: CoffeeItem | null;
   setViewingItem: (i: CoffeeItem | null) => void;
@@ -56,6 +62,7 @@ export default function Modals(props: ModalsProps) {
   const {
     isAuthModalOpen, setIsAuthModalOpen, authMode, setAuthMode, authError, setAuthError, handleAuth, authName, setAuthName, authEmail, setAuthEmail, authPassword, setAuthPassword,
     isFormOpen, setIsFormOpen, editingItem, resetForm, handleSave, formError, name, setName, brand, setBrand, origin, setOrigin, price, setPrice, roast, setRoast, imageUrl, setImageUrl, notes, setNotes,
+    quantity, setQuantity, soldCount, setSoldCount, isPublic, setIsPublic,
     viewingItem, setViewingItem, startEdit,
     deleteConfirmId, setDeleteConfirmId, deleteTarget, confirmDelete,
     isSubmitting, STYLES
@@ -72,10 +79,10 @@ export default function Modals(props: ModalsProps) {
                 <button onClick={() => setIsAuthModalOpen(false)} className="absolute top-5 right-5 z-10 w-6 h-6 bg-red-500 text-white rounded-[5px] flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer"><X className="w-3 h-3" /></button>
                 <div className="text-center space-y-2">
                    <Fingerprint className="w-8 h-8 text-indigo-500 mx-auto" />
-                   <h3 className="text-2xl font-black uppercase tracking-tighter leading-none">{authMode}</h3>
-                   <p className="text-[7.5px] font-black uppercase tracking-[0.2em] text-[var(--text-secondary)]">Identity Authentication</p>
+                   <h3 className="text-2xl font-black tracking-normal leading-none capitalize">{authMode}</h3>
+                   <p className="text-[8.5px] font-bold tracking-normal text-[var(--text-secondary)]">Identity Authentication</p>
                 </div>
-                {authError && <p className="text-red-500 text-[8px] font-black uppercase text-center bg-red-500/5 py-2 rounded-[5px]">{authError}</p>}
+                {authError && <p className="text-red-500 text-[8px] font-black text-center bg-red-500/5 py-2 rounded-[5px]">{authError}</p>}
                 <form onSubmit={handleAuth} className="space-y-3">
                    {authMode === "register" ? (
                      <>
@@ -97,7 +104,7 @@ export default function Modals(props: ModalsProps) {
                    </div>
                 </form>
                 <div className="text-center pt-2">
-                   <button onClick={() => { setAuthMode(authMode === "login" ? "register" : "login"); setAuthError(null); }} className="text-[7.5px] font-black uppercase tracking-widest text-[var(--text-secondary)] hover:text-indigo-500 transition-colors underline underline-offset-4 decoration-indigo-500/20">
+                   <button onClick={() => { setAuthMode(authMode === "login" ? "register" : "login"); setAuthError(null); }} className="text-[8.5px] font-bold tracking-normal text-[var(--text-secondary)] hover:text-indigo-500 transition-colors underline underline-offset-4 decoration-indigo-500/20">
                       {authMode === "login" ? "Create Account" : "Sign In"}
                    </button>
                 </div>
@@ -119,13 +126,13 @@ export default function Modals(props: ModalsProps) {
               >
                  <div className="px-6 py-4 border-b border-[var(--border-color)] flex justify-between items-center bg-[var(--input-bg)]/30 shrink-0">
                     <div className="space-y-0.5">
-                       <h3 className="text-xl font-black uppercase tracking-tight">{editingItem ? "Update Item" : "Add Item"}</h3>
-                       <p className="text-[8px] font-bold uppercase tracking-widest text-indigo-500">Inventory Registry</p>
+                       <h3 className="text-xl font-black tracking-normal">{editingItem ? "Update Item" : "Add Item"}</h3>
+                       <p className="text-[8px] font-bold tracking-normal text-indigo-500">Inventory Registry</p>
                     </div>
                     <button onClick={resetForm} className="w-7 h-7 bg-red-500 text-white rounded-[5px] flex items-center justify-center hover:bg-red-600 transition-colors cursor-pointer"><X className="w-3.5 h-3.5" /></button>
                  </div>
                  <div className="p-4 sm:p-6 space-y-4 overflow-y-auto no-scrollbar">
-                    {formError && <p className="text-red-500 text-[9px] font-black uppercase tracking-widest text-center">{formError}</p>}
+                    {formError && <p className="text-red-500 text-[9px] font-black tracking-normal text-center">{formError}</p>}
                     <form onSubmit={handleSave} className="space-y-4">
                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div className="space-y-1.5">
@@ -154,7 +161,7 @@ export default function Modals(props: ModalsProps) {
                              <label className={STYLES.label}>Roast Level</label>
                              <div className="grid grid-cols-3 gap-2 h-[34px]">
                                 {["Light", "Medium", "Dark"].map(r => (
-                                  <button type="button" key={r} onClick={() => setRoast(r)} className={`flex items-center justify-center rounded-[5px] text-[8px] font-black uppercase border transition-all ${roast === r ? "bg-indigo-500 text-white border-indigo-500" : "bg-[var(--input-bg)] border-[var(--border-color)] text-[var(--text-secondary)] hover:border-indigo-500/30"}`}>{r}</button>
+                                  <button type="button" key={r} onClick={() => setRoast(r)} className={`flex items-center justify-center rounded-[4px] text-[9px] font-bold tracking-normal border transition-all ${roast === r ? "bg-indigo-600 text-white border-indigo-600" : "bg-[var(--input-bg)]/50 border-[var(--border-color)] text-[var(--text-secondary)] hover:border-indigo-500/30"}`}>{r}</button>
                                 ))}
                              </div>
                           </div>
@@ -164,13 +171,45 @@ export default function Modals(props: ModalsProps) {
                           </div>
                        </div>
 
-                       <div className="space-y-1.5">
-                          <label className={STYLES.label}>Notes</label>
-                          <textarea value={notes} onChange={e => setNotes(e.target.value)} className={`${STYLES.input} h-16 py-2 normal-case font-medium`} />
-                       </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                           <div className="space-y-1.5">
+                              <label className={STYLES.label}>Stock Quantity (Units)</label>
+                              <input type="number" required value={quantity} onChange={e => setQuantity(e.target.value)} className={STYLES.input} />
+                           </div>
+                           <div className="space-y-1.5">
+                              <label className={STYLES.label}>Sold performance (Units)</label>
+                              <input type="number" required value={soldCount} onChange={e => setSoldCount(e.target.value)} className={STYLES.input} />
+                           </div>
+                        </div>
 
-                       <div className="flex gap-4 pt-4 border-t border-[var(--border-color)]">
-                          <button type="submit" disabled={isSubmitting} className={`${STYLES.button} py-2.5`}>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                           <div className="space-y-1.5">
+                              <label className={STYLES.label}>Post Visibility</label>
+                              <div className="grid grid-cols-2 gap-2 h-[34px]">
+                                 {[
+                                   { id: 1, label: "Published" },
+                                   { id: 0, label: "Private" }
+                                 ].map(p => (
+                                   <button 
+                                     type="button" 
+                                     key={p.id} 
+                                     onClick={() => setIsPublic(p.id)} 
+                                     className={`flex items-center justify-center rounded-[4px] text-[9px] font-bold tracking-normal border transition-all ${isPublic === p.id ? "bg-indigo-600 text-white border-indigo-600" : "bg-[var(--input-bg)]/50 border-[var(--border-color)] text-[var(--text-secondary)] hover:border-indigo-500/30"}`}
+                                   >
+                                      {p.label}
+                                   </button>
+                                 ))}
+                              </div>
+                           </div>
+                        </div>
+
+                        <div className="space-y-1.5">
+                           <label className={STYLES.label}>Sensory Notes</label>
+                           <textarea value={notes} onChange={e => setNotes(e.target.value)} className={`${STYLES.input} h-16 py-2 normal-case font-medium`} />
+                        </div>
+
+                        <div className="flex gap-4 pt-4 border-t border-[var(--border-color)]">
+                           <button type="submit" disabled={isSubmitting} className={`${STYLES.button} py-2.5 shadow-xl shadow-indigo-600/10`}>
                              {isSubmitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                              {editingItem ? "Update Item" : "Add to Registry"}
                           </button>
@@ -193,14 +232,14 @@ export default function Modals(props: ModalsProps) {
                 <div className="flex-1 p-8 sm:p-12 flex flex-col justify-center space-y-8 overflow-y-auto no-scrollbar">
                    <div className="space-y-4">
                       <div className="flex gap-2 flex-wrap"><span className="px-3 py-1 bg-indigo-500 text-white text-[7.5px] font-black uppercase tracking-widest rounded-[5px]">{viewingItem.roast_level}</span><span className="px-3 py-1 bg-[var(--input-bg)] border border-[var(--border-color)] text-[7.5px] font-black uppercase tracking-widest rounded-[5px]">{viewingItem.origin}</span></div>
-                      <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tighter leading-none">
-                          <span className="text-indigo-500 block text-[9px] mb-2 tracking-[0.4em]">{viewingItem.brand || "Specialty Batch"}</span>
-                          {viewingItem.name}
-                       </h2>
-                      <p className="text-xl font-serif italic text-indigo-500">${viewingItem.price.toFixed(2)}</p>
-                   </div>
-                   <div className="space-y-2"><p className="text-[7.5px] font-black uppercase tracking-[0.4em] text-indigo-500 border-b border-[var(--border-color)] pb-2">Notes</p><p className="text-sm italic font-serif leading-relaxed">"{viewingItem.notes || "No sensory notes specified."}"</p></div>
-                   <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-6 mt-auto"><div className="space-y-0.5"><p className="text-[7px] font-black uppercase tracking-widest text-[var(--text-secondary)]">Date Added</p><p className="text-[9px] font-black">{new Date(viewingItem.roast_date).toLocaleDateString()}</p></div><button onClick={() => { setViewingItem(null); startEdit(viewingItem); }} className={`${STYLES.button} sm:w-auto px-8`}>Update Item</button></div>
+                        <h2 className="text-3xl sm:text-4xl font-black tracking-tighter leading-none">
+                           <span className="text-indigo-500 block text-[9px] mb-2 tracking-widest">{viewingItem.brand || "Specialty Batch"}</span>
+                           {viewingItem.name}
+                        </h2>
+                        <p className="text-xl font-bold text-indigo-500">${viewingItem.price.toFixed(2)}</p>
+                     </div>
+                     <div className="space-y-2"><p className="text-[7.5px] font-black uppercase tracking-[0.4em] text-indigo-500 border-b border-[var(--border-color)] pb-2">Notes</p><p className="text-sm italic leading-relaxed">"{viewingItem.notes || "No sensory notes specified."}"</p></div>
+                   <div className="pt-6 flex flex-col sm:flex-row items-center justify-between gap-6 mt-auto"><div className="space-y-0.5"><p className="text-[7.5px] font-bold tracking-normal text-[var(--text-secondary)]">Date Added</p><p className="text-[10px] font-black">{new Date(viewingItem.roast_date).toLocaleDateString()}</p></div><button onClick={() => { setViewingItem(null); startEdit(viewingItem); }} className={`${STYLES.button} sm:w-auto px-8`}>Update Item</button></div>
                 </div>
              </motion.div>
           </div>
